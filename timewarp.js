@@ -16,6 +16,9 @@ timeWarp.fillStyle = 'black';
 timeWarp.fillRect(0,0, windowWidth, windowHeight);
 
 let star = new Array;
+let spiralTime = 0;
+const spiralA = 10;
+let beginSpinning = false;
 
 class Star 
 {
@@ -25,6 +28,7 @@ class Star
         this.radius = 0;    // this should be mapped with distance to border
         this.speed = 0;
         this.sizeScale = 0;
+        const k = 0;
     }
 
     setPositions(x, y, z)
@@ -50,6 +54,16 @@ class Star
         timeWarp.arc(this.position[0], this.position[1], this.radius, 0, 2 * Math.PI);
         timeWarp.fillStyle = 'white';
         timeWarp.fill();
+    }
+
+    turnAroundZAxis()
+    {
+        debugger;
+        spiralTime = Math.atan2(this.position[1], this.position[0]);
+
+        this.position[0] += spiralA * spiralTime * Math.cos(spiralTime);
+        this.position[1] += spiralA * spiralTime * Math.sin(spiralTime);
+        spiralTime += 0.001;
     }
 
     move()
@@ -117,6 +131,31 @@ function begin(amount)
     }
 }
 
+document.onkeydown = checkKeyD;
+document.onkeyup = checkKeyU;
+
+function checkKeyD(e)
+{
+    if(e.keyCode == "69") 
+    {
+        beginSpinning = true;
+        console.log("e"); // star[i].turnAroundZAxis;
+        for(let i = 0; i < star.length - 1; i++)
+        {
+            debugger;
+            star[i].turnAroundZAxis();
+        }
+    }
+    else if(e.keyCode == "81") console.log("q");
+}
+function checkKeyU(e)
+{
+    if(e.keyCode == "69")
+    {
+        t_spiral = -15;
+    }
+}
+
 function random(min, max)
 {
     return (Math.random() * (max - min) ) + min;
@@ -128,4 +167,4 @@ function clearWindow()
     timeWarp.fillRect(0,0, windowWidth, windowHeight);
 }
 
-begin(2000);
+begin(10000);
