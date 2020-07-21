@@ -1,8 +1,14 @@
+/// to add - rotating aroung z - axis
+/// rotating around x and y axis
+
 var canvas = document.querySelector("canvas");
 var timeWarp = canvas.getContext("2d");
 
 let windowHeight = window.innerHeight;
 let windowWidth = window.innerWidth;
+let spaceCenterX = windowWidth/2;
+let spaceCenterY = windowHeight/2;
+
 canvas.height = windowHeight;
 canvas.width = windowWidth;
 
@@ -16,8 +22,9 @@ class Star
     constructor()
     {
         this.position = [0, 0, 0];
-        this.radius = 2;    // this should be mapped with distance to border
-        this.speed = 0.2;
+        this.radius = 0;    // this should be mapped with distance to border
+        this.speed = 0;
+        this.sizeScale = 0;
     }
 
     setPositions(x, y, z)
@@ -25,6 +32,16 @@ class Star
         this.position[0] = x;
         this.position[1] = y;
         this.position[2] = z;
+    }
+
+    setSpeed()
+    {
+        this.speed = random(0.01, 0.1);
+    }
+
+    setSizeScale()
+    {
+        this.sizeScale = random(10, 100);
     }
 
     draw()
@@ -35,27 +52,16 @@ class Star
         timeWarp.fill();
     }
 
-    move()  // should be made with angle direction based on position - not like now (it goes only in 45 degrees)
+    move()
     {
-        if(windowWidth - this.position[0] > this.position[0] - 0)   // go to the left border
-        {
-            this.position[0] -= this.speed * 10;
-        }
-        else    // go to the right border
-        {
-            this.position[0] += this.speed * 10;
-        }
-        if(windowHeight - this.position[1] > this.position[1] - 0)  // go to the top border
-        {
-            this.position[1] -= this.speed * 10;
-        }
-        else    // go to the bottom border
-        {
-            this.position[1] += this.speed * 10;
-        }
+        let angleRad = Math.atan2(this.position[1] - spaceCenterY, this.position[0] - spaceCenterX);
+        
+        this.position[0] += 5 * this.speed * Math.cos(angleRad);
+        this.position[1] += 5 * this.speed * Math.sin(angleRad);
 
         this.position[2] += this.speed;
-        this.radius += this.speed;
+        this.radius += this.speed/this.sizeScale;
+        this.speed += 0.05;
 
         this.eraseAtBorder();
     }
@@ -73,9 +79,9 @@ class Star
         this.position[0] = random(0, windowWidth);
         this.position[1] = random(0, windowHeight);
         this.position[2] = 0;
-        console.log(this.position[0] + "   " + this.position[1]);
-        this.speed = 0.2;
-        this.radius = 2;
+        this.radius = 0;
+        this.setSizeScale();
+        this.setSpeed();
     }
 }
 
@@ -105,10 +111,11 @@ function begin(amount)
         let z = 0;
 
         star[i].setPositions(x, y, z);
+        star[i].setSizeScale();
+        star[i].setSpeed();
         star[i].draw();
     }
 }
-
 
 function random(min, max)
 {
@@ -121,4 +128,4 @@ function clearWindow()
     timeWarp.fillRect(0,0, windowWidth, windowHeight);
 }
 
-begin(1000);
+begin(2000);
