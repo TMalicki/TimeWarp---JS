@@ -16,19 +16,21 @@ timeWarp.fillStyle = 'black';
 timeWarp.fillRect(0,0, windowWidth, windowHeight);
 
 let star = new Array;
-let spiralTime = 0;
-const spiralA = 10;
-let beginSpinning = false;
+let movingAroundZAxisLeft = false;
+let movingAroundZAxisRight = false;
+//let movingUp = false;
+//let movingDown = false;
 
 class Star 
 {
     constructor()
     {
         this.position = [0, 0, 0];
-        this.radius = 0;    // this should be mapped with distance to border
+        this.radius = 0;    
         this.speed = 0;
         this.sizeScale = 0;
-        const k = 0;
+        this.scalarX = 5;
+        this.scalarY = 5;
     }
 
     setPositions(x, y, z)
@@ -56,22 +58,24 @@ class Star
         timeWarp.fill();
     }
 
-    turnAroundZAxis()
-    {
-        debugger;
-        spiralTime = Math.atan2(this.position[1], this.position[0]);
+    move(angleRad)
+    {    
+        /*    
+        if(this.position[1] < spaceCenterY && movingUp == true) this.scalarY += 0.2;
+        else if(this.position[1] >= spaceCenterY && movingUp == true) this.scalarY -= 0.2
+        else if(this.position[1] < spaceCenterY && movingDown == true) this.scalarY -= 0.2;
+        else if(this.position[1] >= spaceCenterY && movingDown == true) this.scalarY += 0.2;
 
-        this.position[0] += spiralA * spiralTime * Math.cos(spiralTime);
-        this.position[1] += spiralA * spiralTime * Math.sin(spiralTime);
-        spiralTime += 0.001;
-    }
+        if(this.scalarY >= 8.0) this.scalarY = 8.0
+        else if(this.scalarY <= 2.0) this.scalarY = 2.0;
 
-    move()
-    {
-        let angleRad = Math.atan2(this.position[1] - spaceCenterY, this.position[0] - spaceCenterX);
-        
-        this.position[0] += 5 * this.speed * Math.cos(angleRad);
-        this.position[1] += 5 * this.speed * Math.sin(angleRad);
+        if(movingUp == false && movingDown == false)
+        {
+            this.scalarY = 5.0; this.scalarX = 5.0;
+        }
+        */
+        this.position[0] += this.scalarX * this.speed * Math.cos(angleRad);
+        this.position[1] += this.scalarY * this.speed * Math.sin(angleRad);
 
         this.position[2] += this.speed;
         this.radius += this.speed/this.sizeScale;
@@ -105,7 +109,10 @@ function()
     clearWindow();
     for(let i = 0; i<star.length - 1; i++)
     {
-        star[i].move();
+        let angleRad = Math.atan2(star[i].position[1] - spaceCenterY, star[i].position[0] - spaceCenterX);
+        if(movingAroundZAxisLeft == true) angleRad += 0.4;
+        else if(movingAroundZAxisRight == true) angleRad -= 0.4;
+        star[i].move(angleRad);
         star[i].draw();
     }
 }, 1000/60);
@@ -131,6 +138,8 @@ function begin(amount)
     }
 }
 
+//document.addEventListener();
+
 document.onkeydown = checkKeyD;
 document.onkeyup = checkKeyU;
 
@@ -138,22 +147,51 @@ function checkKeyD(e)
 {
     if(e.keyCode == "69") 
     {
-        beginSpinning = true;
-        console.log("e"); // star[i].turnAroundZAxis;
-        for(let i = 0; i < star.length - 1; i++)
-        {
-            debugger;
-            star[i].turnAroundZAxis();
-        }
+        movingAroundZAxisLeft = true;
+      
     }
-    else if(e.keyCode == "81") console.log("q");
+    else if(e.keyCode == "81") 
+    {
+        movingAroundZAxisRight = true;
+    }   
+    /*
+    else if(e.keyCode == "38")
+    {
+        spaceCenterY += 2;
+        if(spaceCenterY > windowHeight/2 + 100) spaceCenterY = windowHeight/2 + 100;
+        movingUp = true;
+
+    }
+    else if(e.keyCode == "40")
+    {
+        spaceCenterY -= 2;
+        if(spaceCenterY < windowHeight/2 - 100) spaceCenterY = windowHeight/2 - 100;
+        movingDown = true;
+    }
+    */
 }
 function checkKeyU(e)
 {
     if(e.keyCode == "69")
     {
-        t_spiral = -15;
+        movingAroundZAxisLeft = false;
     }
+    if(e.keyCode == "81")
+    {
+        movingAroundZAxisRight = false;
+    }
+    /*
+    if(e.keyCode == "38")
+    {
+        spaceCenterY = windowHeight/2;
+        movingUp = false;
+    }
+    if(e.keyCode == "40")
+    {
+        spaceCenterY = windowHeight/2;
+        movingDown = false;
+    }
+    */
 }
 
 function random(min, max)
@@ -167,4 +205,4 @@ function clearWindow()
     timeWarp.fillRect(0,0, windowWidth, windowHeight);
 }
 
-begin(10000);
+begin(2500);
